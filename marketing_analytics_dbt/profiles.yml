@@ -1,0 +1,13 @@
+marketing_analytics_dbt:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: "{{ env_var('GCP_PROJECT_ID', 'dark-bit-493307-d3') }}"
+      dataset: marketing_analytics
+      threads: 4
+      keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS') }}"
+      location: US
+      timeout_seconds: 300
+      priority: interactive

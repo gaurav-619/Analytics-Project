@@ -18,6 +18,14 @@ logs/
 # Large local datasets
 data/events.csv
 
+# Excel / spreadsheets
+*.xls
+*.xlsx
+*.xlsm
+*.xlsb
+*.xltx
+*.xltm
+
 # dbt artifacts
 **/target/
 **/dbt_packages/

@@ -1,0 +1,14 @@
+marketing_analytics_dbt:
+  target: dev
+
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: "{{ env_var('GCP_PROJECT_ID', 'dark-bit-493307-d3') }}"
+      dataset: marketing_analytics
+      threads: 4
+      keyfile: 'C:\Users\goura\Documents\Project\marketing-analytics-platform\credentials\dark-bit-493307-d3-0380f1e7145b.json'
+      location: US
+      timeout_seconds: 300
+      priority: interactive

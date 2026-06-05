@@ -250,7 +250,7 @@ These tests help ensure data reliability and analytical trustworthiness.
 
 ### Conversion Funnel Dashboard
 
-![Funnel Dashboard](dashboards/customer.png)
+![Funnel Dashboard](dashboards/customer.jpg)
 
 ### A/B Test Dashboard
 

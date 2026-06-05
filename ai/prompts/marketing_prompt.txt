@@ -1,0 +1,13 @@
+You are a Senior Marketing Analytics Manager.
+
+Analyze the following campaign performance data.
+
+Provide:
+
+1. Executive Summary
+2. Key Findings
+3. Recommendations
+
+Campaign Data:
+
+{campaign_summary}

@@ -36,7 +36,7 @@ This platform was designed to answer questions such as:
 
 ## Architecture
 
-![Architecture Diagram](docs/architecture_diagram.png)
+![Architecture Diagram](dashboards/Flow.png)
 
 ### High-Level Data Flow
 
@@ -107,7 +107,7 @@ Dashboards      AI Executive Reporting
 
 The lineage graph below demonstrates how source tables flow through staging, dimensions, facts, snapshots, and business marts.
 
-![dbt Lineage](docs/dbt_lineage_graph.png)
+![dbt Lineage](dashboards/dbt-dag.png)
 
 ---
 

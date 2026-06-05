@@ -8,14 +8,14 @@ The project transforms raw marketing, customer, campaign, product, and transacti
 
 The platform demonstrates modern Analytics Engineering practices including:
 
-* Data Warehousing with BigQuery
-* Dimensional Modeling (Star Schema)
-* dbt Transformations
-* Incremental Processing
-* Historical Snapshots
-* Automated Data Quality Testing
-* Business Intelligence Reporting
-* AI-Powered Executive Insights
+- Data Warehousing with Google BigQuery
+- Dimensional Modeling using Star Schema principles
+- dbt Transformations and Modular Data Modeling
+- Incremental Data Processing
+- Historical Tracking with dbt Snapshots
+- Automated Data Quality Validation using dbt Tests
+- Business Intelligence and Reporting
+- AI-Powered Executive Insight Generation
 
 ---
 
@@ -278,6 +278,17 @@ Generated reports include:
 * Strategic Recommendations
 * Risks & Opportunities
 
+The generated report is available at `ai/executive_report.md`.
+
+### Example Executive Summary
+
+- Total revenue: $8,630,269.31
+- Total transactions: 92,678
+- Top marketing channel: Affiliate
+- Best A/B test variant: Control
+
+[View the full executive report](ai/executive_report.md)
+
 This demonstrates how traditional analytics platforms can be enhanced using Generative AI.
 
 ---
@@ -285,6 +296,8 @@ This demonstrates how traditional analytics platforms can be enhanced using Gene
 ## Repository Structure
 
 ```text
+marketing-analytics-platform/
+
 marketing-analytics-platform/
 
 ├── README.md
@@ -295,22 +308,23 @@ marketing-analytics-platform/
 │   ├── generate_insights.py
 │   └── executive_report.md
 
+├── analysis/
+│   └── ab_test_analysis.py
+
+├── credentials/
+│   ├── .gitkeep
+│   └── README.md
+
+├── dashboards/
+│   ├── sales_dashboard.jpg
+│   ├── market_campaign.jpg
+│   ├── flow.png
+│   └── ab_testing.jpg
+
+├── data/
 ├── dbt/
-│   ├── dbt_project.yml
-│   ├── models/
-│   ├── snapshots/
-│   └── tests/
-
 ├── docs/
-│   ├── architecture_diagram.png
-│   └── dbt_lineage_graph.png
-
-├── screenshots/
-│   ├── sales_dashboard.png
-│   ├── campaign_dashboard.png
-│   ├── funnel_dashboard.png
-│   └── ab_test_dashboard.png
-```
+└── python/
 
 ---
 

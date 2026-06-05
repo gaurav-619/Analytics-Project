@@ -242,19 +242,20 @@ These tests help ensure data reliability and analytical trustworthiness.
 
 ### Sales Performance Dashboard
 
-![Sales Dashboard](dashboards/Marketing_&_Sales_Performance_Dashboard_page-0001.jpg)
+![Sales Dashboard](dashboards/sales_dashboard.jpg)
 
 ### Campaign Performance Dashboard
 
-![Campaign Dashboard](dashboards/Market Campaign.jpg)
+![Campaign Dashboard](dashboards/market_campaign.jpg)
 
 ### Conversion Funnel Dashboard
 
-![Funnel Dashboard](dashboards/Flow.png)
+![Funnel Dashboard](dashboards/flow.png)
 
 ### A/B Test Dashboard
 
-![A/B Test Dashboard](dashboards/AB Testing.jpg)
+![A/B Test Dashboard](dashboards/ab_testing.jpg)
+
 ## AI Executive Reporting
 
 An AI reporting layer was built using Python and OpenRouter.
@@ -392,5 +393,4 @@ Potential future improvements include:
 * Forecasting and predictive analytics
 * Natural language analytics assistant
 
-```
 ```

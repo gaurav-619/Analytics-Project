@@ -1,160 +1,396 @@
 # Marketing Analytics Platform
 
-## Project Overview
+## Overview
 
-This repository demonstrates a complete marketing analytics engineering workflow built on BigQuery and dbt. The project turns raw customer, product, campaign, event, and transaction data into analytical marts, snapshots, and dashboards.
+The Marketing Analytics Platform is an end-to-end Analytics Engineering project built using Google BigQuery, dbt, Python, and AI-powered reporting.
 
--it is an analytics platform:
+The project transforms raw marketing, customer, campaign, product, and transaction data into trusted business-ready datasets that support reporting, experimentation analysis, customer analytics, and executive decision-making.
 
-- Raw CSV data is loaded into BigQuery.
-- dbt staging models clean and standardize data.
-- dbt snapshots preserve historical customer state.
-- dbt incremental models process only new transactions.
-- Analytical marts answer key business questions.
-- Dashboards are described conceptually based on the created marts.
+The platform demonstrates modern Analytics Engineering practices including:
+
+* Data Warehousing with BigQuery
+* Dimensional Modeling (Star Schema)
+* dbt Transformations
+* Incremental Processing
+* Historical Snapshots
+* Automated Data Quality Testing
+* Business Intelligence Reporting
+* AI-Powered Executive Insights
+
+---
 
 ## Business Problem
 
-The goal is to help a marketing and analytics team answer questions such as:
+Marketing and business teams often struggle to answer important questions because data is fragmented across multiple sources and lacks a governed analytics layer.
 
-- Which products and campaigns are driving revenue?
-- Where are customers dropping off in the conversion funnel?
-- Which customer segments are most valuable?
-- How do A/B test variants perform?
-- How can incremental ingestion reduce cost and processing time?
+This platform was designed to answer questions such as:
+
+* Which campaigns generate the highest revenue?
+* Which marketing channels perform best?
+* Where do customers drop off in the conversion funnel?
+* Which customer segments are most valuable?
+* How effective are A/B test variations?
+* How can analytical pipelines scale efficiently as data volume grows?
+
+---
 
 ## Architecture
 
-```
-Raw CSV Data
-      ↓
-BigQuery Data Warehouse
-      ↓
+![Architecture Diagram](docs/architecture_diagram.png)
+
+### High-Level Data Flow
+
+```text
+Raw Marketing Data
+        │
+        ▼
+Google BigQuery
+        │
+        ▼
 dbt Transformation Layer
- ├─ Staging
- ├─ Snapshots
- ├─ Incremental Models
- └─ Marts
-      ↓
-Analytics Dashboards
+ ├── Staging Models
+ ├── Dimension Models
+ ├── Fact Models
+ ├── Incremental Models
+ └── Snapshots
+        │
+        ▼
+Business Analytics Marts
+        │
+ ┌──────┴──────────────┐
+ │                     │
+ ▼                     ▼
+
+Dashboards      AI Executive Reporting
 ```
 
-A more detailed architecture view is available in `docs/architecture.md`.
+---
 
-## What Was Built
+## Technology Stack
 
-### Incremental Loading
+| Layer                  | Technology             |
+| ---------------------- | ---------------------- |
+| Data Warehouse         | Google BigQuery        |
+| Analytics Engineering  | dbt                    |
+| Data Modeling          | Star Schema            |
+| Data Quality           | dbt Tests              |
+| Historical Tracking    | dbt Snapshots          |
+| Incremental Processing | dbt Incremental Models |
+| Programming            | Python                 |
+| Dashboarding           | Looker Studio          |
+| AI Reporting           | OpenRouter + Llama     |
+| Version Control        | Git & GitHub           |
 
-- Implemented an incremental dbt model: `dbt/models/marts/fct_transactions_incremental.sql`
-- Used `transaction_id` as the unique key.
-- Applied timestamp-based watermarking to process only newly arrived records.
-- Avoided rebuilding the full fact table on every run.
-- Used a landing source table called `raw_transactions_incremental` to support incremental ingestion.
+---
 
-### Snapshots
+## Data Model
 
-- Implemented `customer_snapshot` in `dbt/snapshots/customer_snapshot.sql`
-- Tracked customer attribute changes over time with a dbt snapshot strategy.
-- Preserved historical customer state for analytics.
+### Dimensions
 
-### dbt Modeling
+* dim_customers
+* dim_products
+* dim_campaigns
 
-- Staging models: `stg_transactions`, `stg_products`, `stg_customers`, `stg_campaigns`, `stg_events`
-- Dimension models: `dim_products`, `dim_customers`, `dim_campaigns`
-- Fact models: `fct_transactions`, `fct_events`
-- `fct_transactions` and `fct_events` are both materialized incrementally to support efficient data processing.
-- Marts:
-  - `mart_sales_summary`
-  - `mart_campaign_performance`
-  - `mart_customer_analytics`
-  - `mart_conversion_funnel`
-  - `mart_ab_test_performance`
-  - `mart_customer_cohort_retention`
+### Facts
 
-### Data Quality
+* fct_transactions
+* fct_events
 
-- dbt tests are defined in `dbt/models/staging/schema.yml`.
-- Quality checks include `not_null`, `unique`, `relationships`, and `accepted_values`.
+### Advanced Models
 
-### Dashboards (Conceptual)
+* fct_transactions_incremental
+* customer_snapshot
 
-This repository does not include actual Looker or dashboard files. The dashboard layer is documented conceptually using the analytics marts.
+---
 
-There is also an analytics script at `analysis/ab_test_analysis.py` that queries `mart_ab_test_performance` and performs statistical comparison across experiment groups.
+## dbt Lineage
 
-Key dashboard themes:
+The lineage graph below demonstrates how source tables flow through staging, dimensions, facts, snapshots, and business marts.
 
-- Sales & Business Performance
-- Customer Funnel Analytics
-- Experimentation & A/B Test Analytics
-- Marketing Campaign Performance
+![dbt Lineage](docs/dbt_lineage_graph.png)
+
+---
+
+## Analytics Engineering Implementation
+
+### Staging Models
+
+Raw source data is standardized and cleaned through dedicated staging models.
+
+* stg_transactions
+* stg_customers
+* stg_products
+* stg_campaigns
+* stg_events
+
+### Dimension Models
+
+Business entities are modeled using dimension tables.
+
+* dim_customers
+* dim_products
+* dim_campaigns
+
+### Fact Models
+
+Business events are modeled using fact tables.
+
+* fct_transactions
+* fct_events
+
+### Business Marts
+
+The platform provides business-ready marts for reporting and analytics.
+
+* mart_sales_summary
+* mart_campaign_performance
+* mart_customer_analytics
+* mart_conversion_funnel
+* mart_ab_test_performance
+* mart_customer_cohort_retention
+
+---
+
+## Incremental Processing
+
+A dedicated incremental model was implemented to process only newly arrived transaction data rather than rebuilding the full dataset.
+
+### Benefits
+
+* Faster execution
+* Reduced BigQuery processing costs
+* Improved scalability
+* Production-oriented architecture
+
+### Example
+
+```sql
+{{ config(
+    materialized='incremental',
+    unique_key='transaction_id'
+) }}
+
+SELECT *
+FROM {{ source('marketing_analytics', 'raw_transactions_incremental') }}
+
+{% if is_incremental() %}
+
+WHERE timestamp >
+(
+    SELECT MAX(timestamp)
+    FROM {{ this }}
+)
+
+{% endif %}
+```
+
+---
+
+## Historical Snapshots
+
+A dbt snapshot was implemented to preserve historical customer state.
+
+Snapshot:
+
+```text
+customer_snapshot
+```
+
+This enables:
+
+* Historical customer analysis
+* Change tracking
+* Slowly Changing Dimension (SCD Type 2) style reporting
+
+### Snapshot Example
+
+```sql
+{% snapshot customer_snapshot %}
+
+{{
+config(
+    unique_key='customer_id',
+    strategy='check',
+    check_cols='all'
+)
+}}
+
+SELECT *
+FROM {{ ref('dim_customers') }}
+
+{% endsnapshot %}
+```
+
+---
+
+## Data Quality & Governance
+
+Automated data quality checks were implemented using dbt tests.
+
+### Implemented Tests
+
+* not_null
+* unique
+* accepted_values
+* relationships
+
+These tests help ensure data reliability and analytical trustworthiness.
+
+---
+
+## Dashboard Examples
+
+### Sales Performance Dashboard
+
+![Sales Dashboard](dashboards/Marketing_&_Sales_Performance_Dashboard_page-0001.jpg)
+
+### Campaign Performance Dashboard
+
+![Campaign Dashboard](dashboards/Market Campaign.jpg)
+
+### Conversion Funnel Dashboard
+
+![Funnel Dashboard](dashboards/Flow.png)
+
+### A/B Test Dashboard
+
+![A/B Test Dashboard](dashboards/AB Testing.jpg)
+## AI Executive Reporting
+
+An AI reporting layer was built using Python and OpenRouter.
+
+The workflow:
+
+1. Query business marts from BigQuery
+2. Aggregate business KPIs
+3. Build structured business context
+4. Send context to an LLM
+5. Generate executive-level business insights
+
+Generated reports include:
+
+* Executive Summary
+* Sales Performance Analysis
+* Marketing Analysis
+* Funnel Analysis
+* Experiment Evaluation
+* Strategic Recommendations
+* Risks & Opportunities
+
+This demonstrates how traditional analytics platforms can be enhanced using Generative AI.
+
+---
 
 ## Repository Structure
 
-- `data/` — source CSV files used to populate BigQuery
-- `python/` — BigQuery utilities and analytics helpers
-  - `load_all_tables.py`
-  - `load_products_to_bigquery.py`
-  - `query.py` — BigQuery connection verification utility
-  - `ingestion.py` — optional Google Trends enrichment script
-- `analysis/` — experiment analysis script for evaluating A/B test results
-- `ai/` — AI helper scripts and prompt assets
-  - `generate_insights.py`
-  - `prompts/marketing_prompt.txt`
-- `dbt/` — dbt project with models, tests, and snapshots
-- `docs/` — architecture documentation
-- `dashboards/` — present but currently empty
+```text
+marketing-analytics-platform/
 
-## Key Files
+├── README.md
+├── requirements.txt
+├── .gitignore
 
-- `dbt/dbt_project.yml`
-- `dbt/models/staging/schema.yml`
-- `dbt/models/marts/fct_transactions_incremental.sql`
-- `dbt/snapshots/customer_snapshot.sql`
-- `python/load_all_tables.py`
-- `python/load_products_to_bigquery.py`
-- `python/query.py`
-- `python/ingestion.py`
-- `analysis/ab_test_analysis.py`
-- `ai/generate_insights.py`
-- `ai/prompts/marketing_prompt.txt`
+├── ai/
+│   ├── generate_insights.py
+│   └── executive_report.md
+
+├── dbt/
+│   ├── dbt_project.yml
+│   ├── models/
+│   ├── snapshots/
+│   └── tests/
+
+├── docs/
+│   ├── architecture_diagram.png
+│   └── dbt_lineage_graph.png
+
+├── screenshots/
+│   ├── sales_dashboard.png
+│   ├── campaign_dashboard.png
+│   ├── funnel_dashboard.png
+│   └── ab_test_dashboard.png
+```
+
+---
 
 ## How to Run
 
-1. Install dependencies for Python and dbt.
-2. Ensure the service account JSON is available at `credentials/service-account.json`.
-3. Load raw CSV data into BigQuery:
-   - `python python/load_all_tables.py`
-   - `python python/load_products_to_bigquery.py`
-4. Run dbt:
-   - `cd dbt`
-   - `dbt deps`
-   - `dbt run`
-   - `dbt test`
-   - `dbt snapshot`
+### Install Dependencies
 
-> Note: The Python ingestion scripts are configured for the Google Cloud project `dark-bit-493307-d3` and load data into the dataset `marketing_analytics`.
+```bash
+pip install -r requirements.txt
+```
+
+### Configure Credentials
+
+Place your Google Cloud service account file in:
+
+```text
+credentials/service-account.json
+```
+
+### Execute dbt
+
+```bash
+cd dbt
+
+dbt deps
+dbt run
+dbt test
+dbt snapshot
+```
+
+### Generate Documentation
+
+```bash
+dbt docs generate
+dbt docs serve
+```
+
+---
 
 ## Business Impact
 
-This project demonstrates how to build a scalable analytics platform that supports:
+The platform enables stakeholders to:
 
-- revenue and product performance analysis
-- marketing campaign optimization
-- customer journey and funnel analysis
-- A/B test evaluation
-- efficient incremental ingestion
-- trusted data via dbt testing and snapshots
+* Monitor revenue performance
+* Analyze customer behavior
+* Evaluate marketing effectiveness
+* Track conversion funnels
+* Measure A/B test performance
+* Understand customer retention
+* Automate executive reporting
 
-## What to Highlight in a Portfolio
+By centralizing business logic within BigQuery and dbt, the platform improves consistency, reduces manual reporting effort, and accelerates decision-making.
 
-- Data warehouse architecture, not just a dashboard
-- dbt transformation layer with staging, snapshots, incremental models, and marts
-- The star schema design around the transaction fact table and dimensions
-- The incremental processing strategy for transaction ingestion
-- Analytical output aligned to business questions
+---
 
-## Notes
+## Key Learnings
 
-- `docs/architecture.md` contains a more detailed architecture diagram and explanation.
-- The `dashboard/` folder is empty, so dashboard details are described rather than implemented.
+This project demonstrates practical experience with:
+
+* Analytics Engineering
+* Data Warehousing
+* Dimensional Modeling
+* Incremental Data Processing
+* Historical Snapshots
+* Data Quality Testing
+* Business Intelligence
+* AI-Augmented Analytics
+* End-to-End Data Platform Design
+
+---
+
+## Future Enhancements
+
+Potential future improvements include:
+
+* Real-time streaming ingestion
+* Workflow orchestration with Airflow
+* Marketing attribution modeling
+* Customer lifetime value prediction
+* Forecasting and predictive analytics
+* Natural language analytics assistant
+
+```
+```
